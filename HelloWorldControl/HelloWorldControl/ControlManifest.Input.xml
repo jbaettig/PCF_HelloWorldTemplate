@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="MBeard" constructor="HelloWorldControl" version="0.0.6" display-name-key="Hello World" description-key="Update your description in here!" control-type="standard">
+  <control namespace="MBeard" constructor="HelloWorldControl" version="0.1.0" display-name-key="Hello World" description-key="Update your description in here!" control-type="standard">
     <external-service-usage enabled="false">
     </external-service-usage>
     <property name="boundField" display-name-key="Bound Field" description-key="Bound Field" of-type="SingleLine.Text" usage="bound" required="true" />

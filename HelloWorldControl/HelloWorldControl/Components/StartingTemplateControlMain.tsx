@@ -1,5 +1,5 @@
 import React = require("react");
-import { Stack, Text } from "@fluentui/react";
+import { Stack, Text, TextField } from "@fluentui/react";
 
 export const StartingTemplateControlMain = (): React.JSX.Element => {
   return (
@@ -14,6 +14,9 @@ export const StartingTemplateControlMain = (): React.JSX.Element => {
           <Text variant={"medium"} block style={{ textAlign: "center" }}>
             Environment check: Module 0 baseline
           </Text>
+        </Stack.Item>
+        <Stack.Item>
+          <TextField value="Environment check: Module 0 baseline" />
         </Stack.Item>
       </Stack>
     </>
