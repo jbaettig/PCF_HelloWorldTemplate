@@ -60,6 +60,7 @@ Use the central ViewModel as the source of truth for shared and committed contro
 - shared filtering, paging, and sorting
 - state used by services or control-level workflows
 - actions that represent meaningful state changes
+- a toggle or preference that controls how a shared or bound value is displayed, formatted, or derived (e.g., a "show encoded value" checkbox for a bound field), even if only one component currently reads it
 
 Use `makeObservable` or `makeAutoObservable` consistently.
 
@@ -90,6 +91,8 @@ Acceptable component-local state includes:
 - a DOM reference
 - integration with a React-only lifecycle
 - other temporary visual state that no sibling component or service needs
+
+Not acceptable as component-local state: a toggle, mode, or derived value that governs how a shared or bound ViewModel value is displayed elsewhere. This can look like simple UI state (a checkbox, a dropdown), but it is a display mode for authoritative data rather than transient component chrome, so it belongs in the ViewModel as observable state with a named or generic `set` action, not `useState`. Example: a "show HTML encoded" checkbox that changes how a bound field's committed value is rendered.
 
 A local draft value may temporarily mirror a ViewModel value while the user is editing. The ViewModel remains the authoritative committed value. This is not considered improper duplication of shared state.
 
@@ -307,6 +310,7 @@ Apply this checklist to code added or changed by the task:
 - [ ] The ViewModel and shared services use the established ServiceProvider.
 - [ ] React state is genuinely component-local, including permitted draft and debounce state.
 - [ ] Local draft state is not incorrectly treated as a second authoritative state store.
+- [ ] A toggle or derived value that governs how shared/bound ViewModel data is displayed is stored as observable ViewModel state, not local `useState`.
 - [ ] Component-owned debounce timers use a render-stable handle such as `useRef` where required.
 - [ ] MobX observable mutations occur through actions.
 - [ ] Components reading observable state use `observer`.
