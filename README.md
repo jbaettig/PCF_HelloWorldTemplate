@@ -29,12 +29,16 @@ This repository contains a simple **HelloWorld PCF control** and an accompanying
 ## 🚀 Getting Started  
 
 ### Prerequisites  
+- A laptop with the ability to install Node.js, VS Code and the Power Platform CLI
+- VS Code with the Github Copilot extentsion, installed, signed in and with agent mode enabled.
 - Node.js 18+  
-- Power Platform CLI (`pac`) installed  
-- A Dataverse environment with the Custom API deployed  
+- Power Platform CLI (`pac`) installed  (install globally with npm -i -g pac or install the Power Platform Tools extension)
+- A Dataverse environment with the Custom API deployed  (a developer environment is more than adequate for our lab)
 
 ### Build & Test the PCF Control  
+Clone this repository
 Confirm you are in the PCF Control directory (HelloWorldControl)
+Confirm you have the Power Platform CLI installed and logged in to your Dataverse environment. Then run:n
 ```bash
 npm install
 npm run build
