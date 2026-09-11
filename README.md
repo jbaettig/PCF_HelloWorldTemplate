@@ -29,6 +29,8 @@ This repository contains a simple **HelloWorld PCF control** and an accompanying
 ## 🚀 Getting Started  
 
 ### Prerequisites  
+- A laptop with the ability to install Node.js, VS Code and the Power Platform CLI
+- VS Code with the **Power Platform Extension** installed
 - Node.js 18+  
 - Power Platform CLI (`pac`) installed  
 - A Dataverse environment with the Custom API deployed  
