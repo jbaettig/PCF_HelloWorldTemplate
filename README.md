@@ -24,6 +24,8 @@ In this exercise, you will replace the Module 0 static environment check with an
 
 Create `HelloWorldControl/HelloWorldControl/Components/FieldControl.tsx`.
 
+This is the first step in being modular, a control per file, to echo the first SOLID principle, Single Responsibility.
+
 Add this code:
 
 ```tsx
@@ -61,6 +63,10 @@ export const FieldControl = (props: FieldControlProps): React.JSX.Element => {
   );
 };
 ```
+
+
+> [!NOTE] 
+> **We assume you understand the Fluent and React parts of this code, if not, ask an instructor**
 
 ### 2. Understand the state line
 
@@ -114,10 +120,13 @@ The main component should retain the welcome heading and render `FieldControl` b
 From the `HelloWorldControl` directory, run:
 
 ```bash
-npm install
 npm run build
 npm start
 ```
+
+> [!WARNING]
+> You may need to resolve any typos you made, or Prettier might decide your code doesnt match your standards. 
+> Prettier runs as part of the build to ensure code is easy to maintain
 
 In the PCF test harness, enter text in the field. The text after **Current value:** should update as you type.
 
