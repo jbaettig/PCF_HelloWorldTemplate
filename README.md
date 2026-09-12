@@ -10,11 +10,10 @@ Updated for **Nordic Summit 2026**, with the same core session content plus a ne
 ## 📍 Workshop Checkpoint: Module 1 — React Fundamentals with useState
 
 **Status:** ✅ Local React state  
-**What's included:**
+**What's done:**
 - FieldControl with React `useState` hook for local state
 - TextField input component from Fluent UI
 - Real-time value display and updates
-- No ViewModel, ServiceProvider, or MobX yet
 - Foundation for learning React state management patterns
 
 ## What to do now?
@@ -25,7 +24,7 @@ Updated for **Nordic Summit 2026**, with the same core session content plus a ne
 In this module you will introduce the architecture that the rest of the workshop builds on:
 
 - **ViewModel:** a class that owns the control's shared state, so React components do not become the long-term source of truth.
-- **MobX observable state:** state that React can automatically re-render when it changes.
+- **MobX observable state:** React can automatically re-render when something changes, anywhere.
 - **MobX actions:** named or centralized methods that update observable state in a predictable way.
 - **ServiceProvider:** a small registry for shared control services and state.
 - **React Context:** the React mechanism used to make the ServiceProvider available to components without passing it through every prop.
@@ -50,7 +49,7 @@ Remove:
 
 ### Step 1 — Create the ServiceProvider
 
-Create `HelloWorldControl\HelloWorldControl\Models\ServiceProvider.ts`:
+Create the folder `HellowworldConrtol\HellowWorldControl\Models` then the file `HelloWorldControl\HelloWorldControl\Models\ServiceProvider.ts` and paste this content:
 
 ```ts
 import React = require("react");
@@ -99,27 +98,31 @@ export class ViewModel {
 }
 ```
 
-The ViewModel is now the authoritative place for the input value. `inputValue` is marked as `observable`, which means MobX can track components that read it. The `set` method is marked as an `action`, which keeps state changes explicit and easy to find.
+The ViewModel is now the authoritative place for the input value. `inputValue` is marked as `observable`, which means MobX can track components that read it. The `set` method is a simple function to update any property in the viewmodel with its value and is marked as an `action`, which keeps state changes explicit and easy to find.
+
+More information can be found here:
+
+https://mobx.js.org/actions.html
 
 ### Step 3 — Register the ViewModel in the PCF control
 
 Edit `HelloWorldControl\HelloWorldControl\index.ts`.
 
-Add these imports near the top:
+Add these imports near the top, below the other imports:
 
 ```ts
 import { ServiceProvider } from "./Models/ServiceProvider";
 import { ViewModel } from "./Models/ViewModel";
 ```
 
-Add these fields to the `HelloWorldControl` class:
+Add these fields to the `HelloWorldControl` class below the `_container`:
 
 ```ts
 serviceProvider: ServiceProvider;
 viewModel: ViewModel;
 ```
 
-In `init`, create the ViewModel and ServiceProvider, then register the ViewModel under the key `"vm"`:
+In `init` method, above the line `this._container = container`, create the ViewModel and ServiceProvider, then register the ViewModel under the key `"vm"`:
 
 ```ts
 this.viewModel = new ViewModel();
@@ -127,7 +130,7 @@ this.serviceProvider = new ServiceProvider();
 this.serviceProvider.register("vm", this.viewModel);
 ```
 
-In `updateView`, copy the current PCF input value into the ViewModel and pass the ServiceProvider into the React component:
+In `updateView` method, copy the current PCF input value into the ViewModel and pass the ServiceProvider into the React component by replacing the code with the below:
 
 ```ts
 const vm = this.viewModel;
@@ -136,8 +139,9 @@ vm.set("inputValue", context.parameters.inputField?.raw ?? "");
 const reactRoot = createRoot(this._container);
 reactRoot.render(React.createElement(StartingTemplateControlMain, { serviceProvider: this.serviceProvider }));
 ```
+The `vm.set` line initialises the value in the viewmodel with what is established in the harness.
 
-This keeps the PCF lifecycle responsible for framework inputs and keeps React focused on rendering and user interaction.
+This keeps the PCF lifecycle responsible for framework inputs and keeps React focused on rendering and user interaction, harking back to our SOLID principles.
 
 ### Step 4 — Provide the ServiceProvider to React components
 
@@ -150,7 +154,7 @@ import { observer } from "mobx-react-lite";
 import { ServiceProvider, ServiceProviderContext } from "../Models/ServiceProvider";
 ```
 
-Add props for the ServiceProvider:
+Add props for the ServiceProvider above the `export const StartingTemplateControlMain`:
 
 ```tsx
 export interface StartingTemplateControlMainProps {
@@ -158,7 +162,7 @@ export interface StartingTemplateControlMainProps {
 }
 ```
 
-Update the component so it is wrapped with `observer` and provides the ServiceProvider through React Context:
+Update the component so it is wrapped with `observer` and provides the ServiceProvider through React Context, replacing the whole definition:
 
 ```tsx
 export const StartingTemplateControlMain = observer((props: StartingTemplateControlMainProps): React.JSX.Element => {
@@ -195,7 +199,7 @@ import { ServiceProviderContext } from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
 ```
 
-Replace the local `useState` value with the ViewModel from the ServiceProvider:
+Replace the local `useState` value with the ViewModel from the ServiceProvider by replacing th whole definition:
 
 ```tsx
 export const FieldControl = observer((props: FieldControlProps): React.JSX.Element => {
@@ -236,14 +240,14 @@ export const FieldControl = observer((props: FieldControlProps): React.JSX.Eleme
 From the PCF project folder:
 
 ```bash
-cd HelloWorldControl
-npm install
 npm run build
-npm run lint
+npm run start
 pac pcf push
 ```
 
-Use `npm run build` to verify the TypeScript and PCF bundle compile. Use `npm run lint` to catch style and quality issues. Use `pac pcf push` when you are ready to deploy the control to your development environment.
+Use `npm run build` to verify the TypeScript and PCF bundle compile. Use `pac pcf push` when you are ready to deploy the control to your development environment.
+
+If you use `npm run start` and try the control, you should not see any fundamental differences, apart from the initial value is taken from the data inputs in the PCF wrapper.
 
 ### Completion checklist
 
