@@ -56,17 +56,17 @@ import { action, makeObservable, observable } from "mobx";
 
 export class ViewModel {
   inputValue: string;
-  boundValue: string;
+  boundValue: string; //Define the boundvalue field
   refresh: () => void;
 
   constructor() {
     this.inputValue = "";
-    this.boundValue = "";
-    this.refresh = () => {};
+    this.boundValue = ""; // initialise the value
+    this.refresh = () => {}; // add teh callback
 
     makeObservable(this, {
       inputValue: observable,
-      boundValue: observable,
+      boundValue: observable, // ensure you make the new field observable
       set: action,
     });
   }
@@ -84,6 +84,7 @@ export class ViewModel {
 Open `HelloWorldControl\HelloWorldControl\index.ts`.
 
 In `init`, immediately after creating the ViewModel, assign `refresh` so ViewModel-driven UI changes can notify the framework:
+This simple change calls the PCF wrapper to update the underlying field(s) when updating the viewmodel.
 
 ```ts
 this.viewModel = new ViewModel();
@@ -100,7 +101,7 @@ const vm = this.viewModel;
 vm.set("boundValue", context.parameters.boundField?.raw ?? "");
 ```
 
-This keeps the value received from the host form separate from the value the component is preparing to output.
+This keeps the value received from the host form separate from the value the component is preparing to output, allowing for a "previous and current" state.
 
 Update `getOutputs()` so Power Apps receives the current ViewModel input value as the manifest output property:
 
@@ -146,7 +147,7 @@ The important change is calling `vm.refresh()` after updating `inputValue`. With
 
 ### 4. Add a button that updates the same output
 
-Create `HelloWorldControl\HelloWorldControl\Components\BoundButtonControl.tsx`:
+Create `HelloWorldControl\HelloWorldControl\Components\BoundButtonControl.tsx` with the following code:
 
 ```tsx
 import * as React from "react";
@@ -203,10 +204,8 @@ Render the button directly after `FieldControl`:
 From the PCF project folder:
 
 ```powershell
-cd HelloWorldControl
-npm install
 npm run build
-npm run lint
+npm run start
 pac pcf push
 ```
 
@@ -228,7 +227,7 @@ To compare your result with the completed checkpoint, run this from the reposito
 git diff --stat module-3-done -- HelloWorldControl\HelloWorldControl\Components\BoundButtonControl.tsx HelloWorldControl\HelloWorldControl\Components\FieldControl.tsx HelloWorldControl\HelloWorldControl\Components\StartingTemplateControlMain.tsx HelloWorldControl\HelloWorldControl\Models\ViewModel.ts HelloWorldControl\HelloWorldControl\index.ts
 ```
 
-No output means your module files match `module-3-done`.
+No output means your module files match `module-3-done`. You will more than likely have some discrepencies as you are only human!
 
 **Next preview:** Module 4 introduces Dataverse integration and async data loading, keeping all Dataverse communication behind the project service boundary.
 
