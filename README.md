@@ -1,7 +1,7 @@
 # From Scratch to Solid — PCF Example
 
 Supporting code for my **South Coast Summit 2025** session:  
-**"From Scratch to Solid: A Reusable Framework for PCF Components"**  
+**"From Scratch to Solid: A Reusable Framework for PCF Components"**
 
 Updated for **Nordic Summit 2026**, with the same core session content plus a new Copilot **skill** (`pcf-standards`) that captures the architecture as reusable AI guidance.
 
@@ -11,6 +11,7 @@ Updated for **Nordic Summit 2026**, with the same core session content plus a ne
 
 **Status:** ✅ Output properties and two-way interaction  
 **What's included:**
+
 - ViewModel with `refresh()` callback for notifying framework of output changes
 - FieldControl that calls `vm.refresh()` on input changes
 - BoundButtonControl demonstrating button-triggered updates
@@ -18,6 +19,7 @@ Updated for **Nordic Summit 2026**, with the same core session content plus a ne
 - Bound field synchronization pattern
 
 **Key Concepts:**
+
 - Two-way binding between PCF and form
 - Framework notification via `notifyOutputChanged()`
 - Output parameter mapping
@@ -60,6 +62,11 @@ Remove:
 
 ### Step 1 — Create the DataverseService
 
+Utilising our SOLID Principles, we think about the Single remit again, making a service for any interaction with dataverse rather than including in the PCF render or view model.
+
+> [!NOTE]
+> BIG assumption you have accounts. Feel free to update to another table if you dont.
+
 Create `HelloWorldControl\HelloWorldControl\Models\DataverseService.ts`:
 
 ```ts
@@ -73,7 +80,10 @@ export class DataverseService {
   webApi: ComponentFramework.WebApi;
   context: ComponentFramework.Context<IInputs>;
 
-  constructor(webApi: ComponentFramework.WebApi, context: ComponentFramework.Context<IInputs>) {
+  constructor(
+    webApi: ComponentFramework.WebApi,
+    context: ComponentFramework.Context<IInputs>,
+  ) {
     this.webApi = webApi;
     this.context = context;
   }
@@ -87,7 +97,7 @@ export class DataverseService {
 ```
 
 **Why is this needed now?**  
-React components and control lifecycle methods should not execute raw Web API calls directly or parse API payloads. Putting `retrieveMultipleRecords` inside `DataverseService` isolates Dataverse query construction and response mapping in one dedicated location.
+React components and control lifecycle methods should not execute raw Web API calls directly or parse API payloads. Putting `retrieveMultipleRecords` inside `DataverseService` isolates Dataverse query construction and response mapping in one dedicated location, making maintainability easier.
 
 ---
 
@@ -147,26 +157,33 @@ import { ViewModel } from "../Models/ViewModel";
 
 export interface ListControlProps {}
 
-export const ListControl = observer((props: ListControlProps): React.JSX.Element => {
-  const serviceProvider = React.useContext(ServiceProviderContext);
-  const vm = serviceProvider.get<ViewModel>("vm");
+export const ListControl = observer(
+  (props: ListControlProps): React.JSX.Element => {
+    const serviceProvider = React.useContext(ServiceProviderContext);
+    const vm = serviceProvider.get<ViewModel>("vm");
 
-  return (
-    <>
-      {vm.displayValues.length > 0 && (
-        <>
-          {vm.displayValues.map((displayVal, index) => {
-            return (
-              <Text variant={"medium"} block style={{ textAlign: "center" }} key={index}>
-                {displayVal}
-              </Text>
-            );
-          })}
-        </>
-      )}
-    </>
-  );
-});
+    return (
+      <>
+        {vm.displayValues.length > 0 && (
+          <>
+            {vm.displayValues.map((displayVal, index) => {
+              return (
+                <Text
+                  variant={"medium"}
+                  block
+                  style={{ textAlign: "center" }}
+                  key={index}
+                >
+                  {displayVal}
+                </Text>
+              );
+            })}
+          </>
+        )}
+      </>
+    );
+  },
+);
 ```
 
 **Why is this needed now?**  
@@ -189,51 +206,61 @@ import { ViewModel } from "../Models/ViewModel";
 
 export interface BoundButtonControlProps {}
 
-export const BoundButtonControl = observer((props: BoundButtonControlProps): React.JSX.Element => {
-  const serviceProvider = React.useContext(ServiceProviderContext);
-  const vm = serviceProvider.get<ViewModel>("vm");
-  const [input, setInput] = React.useState<string>(vm.boundValue);
-  const debounceTimer = React.useRef<number | undefined>(undefined);
+export const BoundButtonControl = observer(
+  (props: BoundButtonControlProps): React.JSX.Element => {
+    const serviceProvider = React.useContext(ServiceProviderContext);
+    const vm = serviceProvider.get<ViewModel>("vm");
+    const [input, setInput] = React.useState<string>(vm.boundValue);
+    const debounceTimer = React.useRef<number | undefined>(undefined);
 
-  return (
-    <>
-      <Stack horizontal={false} verticalAlign={"center"} style={{ width: "100%", padding: "10px" }}>
-        <Stack.Item>
-          <Text variant={"medium"} block>
-            Input Bound Value:
-          </Text>
-        </Stack.Item>
-        <Stack.Item>
-          <TextField
-            value={input}
-            onChange={(e, newValue) => {
-              const val = newValue ?? "";
-              setInput(val);
+    return (
+      <>
+        <Stack
+          horizontal={false}
+          verticalAlign={"center"}
+          style={{ width: "100%", padding: "10px" }}
+        >
+          <Stack.Item>
+            <Text variant={"medium"} block>
+              Input Bound Value:
+            </Text>
+          </Stack.Item>
+          <Stack.Item>
+            <TextField
+              value={input}
+              onChange={(e, newValue) => {
+                const val = newValue ?? "";
+                setInput(val);
 
-              window.clearTimeout(debounceTimer.current);
-              debounceTimer.current = window.setTimeout(() => {
-                vm.set("boundValue", val);
+                window.clearTimeout(debounceTimer.current);
+                debounceTimer.current = window.setTimeout(() => {
+                  vm.set("boundValue", val);
+                  vm.refresh?.();
+                }, 300);
+              }}
+              onBlur={() => {
+                window.clearTimeout(debounceTimer.current);
+                vm.set("boundValue", input);
                 vm.refresh?.();
-              }, 300);
-            }}
-            onBlur={() => {
-              window.clearTimeout(debounceTimer.current);
-              vm.set("boundValue", input);
-              vm.refresh?.();
-            }}
-            placeholder="Enter text"
-            styles={{ root: { width: "100%" } }}
-          />
-        </Stack.Item>
-        <Stack.Item>
-          <Text variant={"medium"} block style={{ textAlign: "center", marginTop: "10px" }}>
-            Current bound value: {vm.boundValue}
-          </Text>
-        </Stack.Item>
-      </Stack>
-    </>
-  );
-});
+              }}
+              placeholder="Enter text"
+              styles={{ root: { width: "100%" } }}
+            />
+          </Stack.Item>
+          <Stack.Item>
+            <Text
+              variant={"medium"}
+              block
+              style={{ textAlign: "center", marginTop: "10px" }}
+            >
+              Current bound value: {vm.boundValue}
+            </Text>
+          </Stack.Item>
+        </Stack>
+      </>
+    );
+  },
+);
 ```
 
 **Why is this needed now?**  
@@ -251,7 +278,10 @@ Import `ViewModel` and `ListControl`, retrieve the ViewModel, and render conditi
 import React = require("react");
 import { Stack, Text } from "@fluentui/react";
 import { observer } from "mobx-react-lite";
-import { ServiceProvider, ServiceProviderContext } from "../Models/ServiceProvider";
+import {
+  ServiceProvider,
+  ServiceProviderContext,
+} from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
 import { FieldControl } from "./FieldControl";
 import { BoundButtonControl } from "./BoundButtonControl";
@@ -261,44 +291,58 @@ export interface StartingTemplateControlMainProps {
   serviceProvider: ServiceProvider;
 }
 
-export const StartingTemplateControlMain = observer((props: StartingTemplateControlMainProps): React.JSX.Element => {
-  const vm = props.serviceProvider.get<ViewModel>("vm");
+export const StartingTemplateControlMain = observer(
+  (props: StartingTemplateControlMainProps): React.JSX.Element => {
+    const vm = props.serviceProvider.get<ViewModel>("vm");
 
-  return (
-    <>
-      <ServiceProviderContext.Provider value={props.serviceProvider}>
-        <Stack horizontal={false} verticalAlign={"center"} style={{ width: "100%" }}>
-          <Stack.Item>
-            <Text variant={"xLarge"} block style={{ textAlign: "center" }}>
-              Welcome to PCF Hello World
-            </Text>
-          </Stack.Item>
-          <Stack.Item>
-            <FieldControl />
-          </Stack.Item>
-          <Stack.Item>
-            <BoundButtonControl />
-          </Stack.Item>
-          {vm.loading && (
+    return (
+      <>
+        <ServiceProviderContext.Provider value={props.serviceProvider}>
+          <Stack
+            horizontal={false}
+            verticalAlign={"center"}
+            style={{ width: "100%" }}
+          >
             <Stack.Item>
-              <Text variant={"medium"} block style={{ textAlign: "center" }}>
-                Loading accounts...
+              <Text variant={"xLarge"} block style={{ textAlign: "center" }}>
+                Welcome to PCF Hello World
               </Text>
             </Stack.Item>
-          )}
-          {vm.displayValues.length > 0 && (
             <Stack.Item>
-              <Text variant={"medium"} block style={{ textAlign: "center", marginTop: "20px", fontWeight: "bold" }}>
-                Loaded Accounts:
-              </Text>
-              <ListControl />
+              <FieldControl />
             </Stack.Item>
-          )}
-        </Stack>
-      </ServiceProviderContext.Provider>
-    </>
-  );
-});
+            <Stack.Item>
+              <BoundButtonControl />
+            </Stack.Item>
+            {vm.loading && (
+              <Stack.Item>
+                <Text variant={"medium"} block style={{ textAlign: "center" }}>
+                  Loading accounts...
+                </Text>
+              </Stack.Item>
+            )}
+            {vm.displayValues.length > 0 && (
+              <Stack.Item>
+                <Text
+                  variant={"medium"}
+                  block
+                  style={{
+                    textAlign: "center",
+                    marginTop: "20px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Loaded Accounts:
+                </Text>
+                <ListControl />
+              </Stack.Item>
+            )}
+          </Stack>
+        </ServiceProviderContext.Provider>
+      </>
+    );
+  },
+);
 ```
 
 ---
@@ -321,7 +365,10 @@ import { ViewModel } from "./Models/ViewModel";
 import { DataverseService } from "./Models/DataverseService";
 import { StartingTemplateControlMain } from "./Components/StartingTemplateControlMain";
 
-export class HelloWorldControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class HelloWorldControl implements ComponentFramework.StandardControl<
+  IInputs,
+  IOutputs
+> {
   private _container: HTMLDivElement;
   serviceProvider: ServiceProvider;
   viewModel: ViewModel;
@@ -339,7 +386,10 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
     };
     this.serviceProvider = new ServiceProvider();
     this.serviceProvider.register("vm", this.viewModel);
-    this.serviceProvider.register("dv", new DataverseService(context.webAPI, context));
+    this.serviceProvider.register(
+      "dv",
+      new DataverseService(context.webAPI, context),
+    );
     context.mode.trackContainerResize(true);
   }
 
@@ -368,7 +418,11 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
     }
 
     const reactRoot = createRoot(this._container);
-    reactRoot.render(React.createElement(StartingTemplateControlMain, { serviceProvider: this.serviceProvider }));
+    reactRoot.render(
+      React.createElement(StartingTemplateControlMain, {
+        serviceProvider: this.serviceProvider,
+      }),
+    );
   }
 
   public getOutputs(): IOutputs {
@@ -388,14 +442,12 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
 From the PCF project folder:
 
 ```powershell
-cd HelloWorldControl
-npm install
 npm run build
-npm run lint
+npm run start
 pac pcf push
 ```
 
-Use `npm run build` and `npm run lint` to verify compilation and code quality. Test in your Power Apps environment to confirm account names are fetched and rendered upon control initialization.
+Test in your Power Apps environment to confirm account names are fetched and rendered upon control initialization. There is a limitation of the harness where read multiple are blocked, so we need to deploy to see it in action.
 
 ---
 
@@ -422,14 +474,17 @@ No output means your code matches `module-4-done`!
 
 ---
 
-## 🚀 Getting Started  
+## 🚀 Getting Started
 
-### Prerequisites  
-- Node.js 18+  
-- Power Platform CLI (`pac`) installed  
+### Prerequisites
 
-### Build & Test the PCF Control  
+- Node.js 18+
+- Power Platform CLI (`pac`) installed
+
+### Build & Test the PCF Control
+
 Confirm you are in the PCF Control directory (HelloWorldControl)
+
 ```bash
 npm install
 npm run build
@@ -438,18 +493,17 @@ pac pcf push
 
 ---
 
-## 📚 Resources  
+## 📚 Resources
 
-- [Power Platform CLI docs](https://learn.microsoft.com/power-platform/developer/cli/introduction)  
-- [Fluent UI](https://developer.microsoft.com/fluentui)  
-- [MobX](https://mobx.js.org/)  
+- [Power Platform CLI docs](https://learn.microsoft.com/power-platform/developer/cli/introduction)
+- [Fluent UI](https://developer.microsoft.com/fluentui)
+- [MobX](https://mobx.js.org/)
 - [PCF Output Properties](https://learn.microsoft.com/power-apps/developer/component-framework/manifest-schema-reference/property)
 
 ---
 
-## 🙌 Credits  
+## 🙌 Credits
 
 Built for **South Coast Summit 2025**.  
 Updated for **Nordic Summit 2026**.  
 Thanks to Carl Cookson for the always incredible assistance!
-
