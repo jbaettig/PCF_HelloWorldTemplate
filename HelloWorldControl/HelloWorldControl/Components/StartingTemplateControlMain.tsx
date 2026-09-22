@@ -72,7 +72,7 @@ const MainContent = ({ serviceProvider, viewModel }: MainContentProps): React.JS
           <Icon iconName="Home" styles={{ root: { fontSize: 26, color: theme.palette.themePrimary } }} />
           <Stack tokens={{ childrenGap: 2 }}>
             <Text variant="xLarge" styles={{ root: { fontWeight: 600, color: theme.semanticColors.bodyText } }}>
-              Hello World control
+              Hello World Control
             </Text>
             <Text variant="small" styles={{ root: { color: theme.semanticColors.bodySubtext } }}>
               Edit values and preview the connected data.
