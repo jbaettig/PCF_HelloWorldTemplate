@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Stack, Text, TextField } from "@fluentui/react";
+import { PrimaryButton, Stack, Text, TextField } from "@fluentui/react";
 import { observer } from "mobx-react-lite";
 import { ServiceProviderContext } from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
@@ -40,6 +40,14 @@ export const BoundButtonControl = observer((props: BoundButtonControlProps): Rea
             }}
             placeholder="Enter text"
             styles={{ root: { width: "100%" } }}
+          />
+        </Stack.Item>
+        <Stack.Item>
+          <PrimaryButton
+            text="Alert bound value"
+            onClick={() => {
+              window.alert(`Bound value: ${vm.boundValue}`);
+            }}
           />
         </Stack.Item>
         <Stack.Item>
