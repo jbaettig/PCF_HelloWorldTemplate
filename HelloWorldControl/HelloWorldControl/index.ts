@@ -36,6 +36,16 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
     this.viewModel.refresh = () => {
       notifyOutputChanged();
     };
+    this.viewModel.openRecord = (entityName, recordId) => {
+      context.navigation
+        .openForm({
+          entityName,
+          entityId: recordId,
+        })
+        .catch((error: unknown) => {
+          console.error(`Error opening ${entityName} record:`, error);
+        });
+    };
     this.serviceProvider = new ServiceProvider();
     this.serviceProvider.register("vm", this.viewModel);
     this.serviceProvider.register("dv", new DataverseService(context.webAPI, context));
@@ -58,7 +68,9 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
         .then((result) => {
           vm.set(
             "displayValues",
-            result.map((entity) => entity.name ?? ""),
+            result
+              .filter((entity) => entity.accountid)
+              .map((entity) => ({ id: entity.accountid as string, name: entity.name ?? "Unnamed account" })),
           );
         })
         .catch((error) => {
@@ -76,7 +88,9 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
         .then((result) => {
           vm.set(
             "contactDisplayValues",
-            result.map((entity) => entity.fullname ?? ""),
+            result
+              .filter((entity) => entity.contactid)
+              .map((entity) => ({ id: entity.contactid as string, name: entity.fullname ?? "Unnamed contact" })),
           );
         })
         .catch((error) => {

@@ -1,10 +1,12 @@
 import { IInputs } from "../generated/ManifestTypes";
 
 export interface AccountSummary {
+  accountid?: string;
   name?: string;
 }
 
 export interface ContactSummary {
+  contactid?: string;
   fullname?: string;
 }
 
@@ -19,13 +21,13 @@ export class DataverseService {
 
   loadData(): Promise<AccountSummary[]> {
     return this.webApi
-      .retrieveMultipleRecords("account", "?$select=name&$top=5")
+      .retrieveMultipleRecords("account", "?$select=accountid,name&$top=5")
       .then((response) => (response?.entities ?? []) as AccountSummary[]);
   }
 
   loadContacts(): Promise<ContactSummary[]> {
     return this.webApi
-      .retrieveMultipleRecords("contact", "?$select=fullname&$top=5")
+      .retrieveMultipleRecords("contact", "?$select=contactid,fullname&$top=5")
       .then((response) => (response?.entities ?? []) as ContactSummary[]);
   }
 }

@@ -1,14 +1,20 @@
 import { action, makeObservable, observable } from "mobx";
 
+export interface DisplayRecord {
+  id: string;
+  name: string;
+}
+
 export class ViewModel {
   inputValue: string;
   boundValue: string;
-  displayValues: string[];
-  contactDisplayValues: string[];
+  displayValues: DisplayRecord[];
+  contactDisplayValues: DisplayRecord[];
   loading: boolean;
   loadingContacts: boolean;
 
   refresh?: () => void;
+  openRecord?: (entityName: "account" | "contact", recordId: string) => void;
 
   constructor() {
     this.inputValue = "";
