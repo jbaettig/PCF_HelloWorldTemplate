@@ -17,7 +17,7 @@ import { ViewModel } from "../Models/ViewModel";
 import { FieldControl } from "./FieldControl";
 import { BoundButtonControl } from "./BoundButtonControl";
 import { ContactListControl } from "./ContactListControl";
-import { ListControl } from "./ListControl";
+import { AccountListControl } from "./AccountListControl";
 
 export interface StartingTemplateControlMainProps {
   serviceProvider: ServiceProvider;
@@ -99,7 +99,7 @@ const MainContent = ({ serviceProvider, viewModel }: MainContentProps): React.JS
                 Loaded accounts
               </Text>
             </Stack>
-            <ListControl />
+            <AccountListControl />
           </Stack>
         )}
         {viewModel.contactDisplayValues.length > 0 && (

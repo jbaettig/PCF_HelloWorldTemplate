@@ -4,9 +4,9 @@ import { observer } from "mobx-react-lite";
 import { ServiceProviderContext } from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
 
-export interface ListControlProps {}
+export interface AccountListControlProps {}
 
-export const ListControl = observer((props: ListControlProps): React.JSX.Element => {
+export const AccountListControl = observer((props: AccountListControlProps): React.JSX.Element => {
   const serviceProvider = React.useContext(ServiceProviderContext);
   const vm = serviceProvider.get<ViewModel>("vm");
   const theme = useTheme();
