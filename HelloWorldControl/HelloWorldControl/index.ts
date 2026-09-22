@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React = require("react");
 import { createRoot } from "react-dom/client";
+import { Theme } from "@fluentui/react";
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { ServiceProvider } from "./Models/ServiceProvider";
 import { ViewModel } from "./Models/ViewModel";
@@ -70,7 +71,12 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
     }
 
     const reactRoot = createRoot(this._container);
-    reactRoot.render(React.createElement(StartingTemplateControlMain, { serviceProvider: this.serviceProvider }));
+    reactRoot.render(
+      React.createElement(StartingTemplateControlMain, {
+        serviceProvider: this.serviceProvider,
+        theme: context.fluentDesignLanguage?.tokenTheme as Theme | undefined,
+      }),
+    );
   }
 
   /**

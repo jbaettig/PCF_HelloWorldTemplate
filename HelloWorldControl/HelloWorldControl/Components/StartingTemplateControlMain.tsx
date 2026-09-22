@@ -1,5 +1,16 @@
 import React = require("react");
-import { Stack, Text } from "@fluentui/react";
+import {
+  Icon,
+  MessageBar,
+  MessageBarType,
+  Spinner,
+  SpinnerSize,
+  Stack,
+  Text,
+  Theme,
+  ThemeProvider,
+  useTheme,
+} from "@fluentui/react";
 import { observer } from "mobx-react-lite";
 import { ServiceProvider, ServiceProviderContext } from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
@@ -9,6 +20,7 @@ import { ListControl } from "./ListControl";
 
 export interface StartingTemplateControlMainProps {
   serviceProvider: ServiceProvider;
+  theme?: Theme;
 }
 
 export const StartingTemplateControlMain = observer((props: StartingTemplateControlMainProps): React.JSX.Element => {
@@ -16,36 +28,75 @@ export const StartingTemplateControlMain = observer((props: StartingTemplateCont
 
   return (
     <>
-      <ServiceProviderContext.Provider value={props.serviceProvider}>
-        <Stack horizontal={false} verticalAlign={"center"} style={{ width: "100%" }}>
-          <Stack.Item>
-            <Text variant={"xLarge"} block style={{ textAlign: "center" }}>
-              Welcome to PCF Hello World
-            </Text>
-          </Stack.Item>
-          <Stack.Item>
-            <FieldControl />
-          </Stack.Item>
-          <Stack.Item>
-            <BoundButtonControl />
-          </Stack.Item>
-          {vm.loading && (
-            <Stack.Item>
-              <Text variant={"medium"} block style={{ textAlign: "center" }}>
-                Loading accounts...
-              </Text>
-            </Stack.Item>
-          )}
-          {vm.displayValues.length > 0 && (
-            <Stack.Item>
-              <Text variant={"medium"} block style={{ textAlign: "center", marginTop: "20px", fontWeight: "bold" }}>
-                Loaded Accounts:
-              </Text>
-              <ListControl />
-            </Stack.Item>
-          )}
-        </Stack>
-      </ServiceProviderContext.Provider>
+      <ThemeProvider theme={props.theme}>
+        <MainContent serviceProvider={props.serviceProvider} viewModel={vm} />
+      </ThemeProvider>
     </>
   );
 });
+
+interface MainContentProps {
+  serviceProvider: ServiceProvider;
+  viewModel: ViewModel;
+}
+
+const MainContent = ({ serviceProvider, viewModel }: MainContentProps): React.JSX.Element => {
+  const theme = useTheme();
+
+  return (
+    <ServiceProviderContext.Provider value={serviceProvider}>
+      <Stack
+        tokens={{ childrenGap: 16 }}
+        styles={{
+          root: {
+            width: "100%",
+            boxSizing: "border-box",
+            padding: 20,
+            background: theme.semanticColors.bodyBackground,
+            color: theme.semanticColors.bodyText,
+          },
+        }}
+      >
+        <Stack
+          horizontal
+          verticalAlign="center"
+          tokens={{ childrenGap: 12 }}
+          styles={{
+            root: {
+              padding: "4px 0 8px",
+              borderBottom: `1px solid ${theme.semanticColors.variantBorder}`,
+            },
+          }}
+        >
+          <Icon iconName="Home" styles={{ root: { fontSize: 26, color: theme.palette.themePrimary } }} />
+          <Stack tokens={{ childrenGap: 2 }}>
+            <Text variant="xLarge" styles={{ root: { fontWeight: 600, color: theme.semanticColors.bodyText } }}>
+              Hello World control
+            </Text>
+            <Text variant="small" styles={{ root: { color: theme.semanticColors.bodySubtext } }}>
+              Edit values and preview the connected data.
+            </Text>
+          </Stack>
+        </Stack>
+        <FieldControl />
+        <BoundButtonControl />
+        {viewModel.loading && (
+          <MessageBar messageBarType={MessageBarType.info} isMultiline={false}>
+            <Spinner size={SpinnerSize.small} label="Loading accounts..." />
+          </MessageBar>
+        )}
+        {viewModel.displayValues.length > 0 && (
+          <Stack tokens={{ childrenGap: 10 }}>
+            <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 8 }}>
+              <Icon iconName="ContactList" styles={{ root: { color: theme.palette.themePrimary } }} />
+              <Text variant="mediumPlus" styles={{ root: { fontWeight: 600 } }}>
+                Loaded accounts
+              </Text>
+            </Stack>
+            <ListControl />
+          </Stack>
+        )}
+      </Stack>
+    </ServiceProviderContext.Provider>
+  );
+};

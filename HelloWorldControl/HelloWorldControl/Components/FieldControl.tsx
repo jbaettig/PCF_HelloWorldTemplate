@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Stack, Text, TextField } from "@fluentui/react";
+import { Icon, Stack, Text, TextField, useTheme } from "@fluentui/react";
 import { observer } from "mobx-react-lite";
 import { ServiceProviderContext } from "../Models/ServiceProvider";
 import { ViewModel } from "../Models/ViewModel";
@@ -9,18 +9,32 @@ export interface FieldControlProps {}
 export const FieldControl = observer((props: FieldControlProps): React.JSX.Element => {
   const serviceProvider = React.useContext(ServiceProviderContext);
   const vm = serviceProvider.get<ViewModel>("vm");
+  const theme = useTheme();
 
   const [input, setInput] = React.useState(vm.inputValue);
   const debounceTimer = React.useRef<number | undefined>(undefined);
 
   return (
     <>
-      <Stack horizontal={false} verticalAlign={"center"} style={{ width: "100%", padding: "10px" }}>
-        <Stack.Item>
-          <Text variant={"medium"} block>
-            Input Static Value:
+      <Stack
+        tokens={{ childrenGap: 10 }}
+        styles={{
+          root: {
+            width: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            background: theme.semanticColors.bodyStandoutBackground,
+            border: `1px solid ${theme.semanticColors.variantBorder}`,
+            borderRadius: 6,
+          },
+        }}
+      >
+        <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 8 }}>
+          <Icon iconName="Edit" styles={{ root: { color: theme.palette.themePrimary } }} />
+          <Text variant="mediumPlus" styles={{ root: { fontWeight: 600 } }}>
+            Input static value
           </Text>
-        </Stack.Item>
+        </Stack>
         <Stack.Item>
           <TextField
             value={input}
@@ -40,12 +54,13 @@ export const FieldControl = observer((props: FieldControlProps): React.JSX.Eleme
               vm.refresh?.();
             }}
             placeholder="Enter text"
+            ariaLabel="Input static value"
             styles={{ root: { width: "100%" } }}
           />
         </Stack.Item>
         <Stack.Item>
-          <Text variant={"medium"} block style={{ textAlign: "center", marginTop: "10px" }}>
-            Current input: {vm.inputValue}
+          <Text variant="small" styles={{ root: { color: theme.semanticColors.bodySubtext } }}>
+            Current value: {vm.inputValue || "Not set"}
           </Text>
         </Stack.Item>
       </Stack>
