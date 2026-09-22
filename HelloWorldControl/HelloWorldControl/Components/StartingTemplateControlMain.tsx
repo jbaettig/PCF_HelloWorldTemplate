@@ -16,6 +16,7 @@ import { ServiceProvider, ServiceProviderContext } from "../Models/ServiceProvid
 import { ViewModel } from "../Models/ViewModel";
 import { FieldControl } from "./FieldControl";
 import { BoundButtonControl } from "./BoundButtonControl";
+import { ContactListControl } from "./ContactListControl";
 import { ListControl } from "./ListControl";
 
 export interface StartingTemplateControlMainProps {
@@ -85,6 +86,11 @@ const MainContent = ({ serviceProvider, viewModel }: MainContentProps): React.JS
             <Spinner size={SpinnerSize.small} label="Loading accounts..." />
           </MessageBar>
         )}
+        {viewModel.loadingContacts && (
+          <MessageBar messageBarType={MessageBarType.info} isMultiline={false}>
+            <Spinner size={SpinnerSize.small} label="Loading contacts..." />
+          </MessageBar>
+        )}
         {viewModel.displayValues.length > 0 && (
           <Stack tokens={{ childrenGap: 10 }}>
             <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 8 }}>
@@ -94,6 +100,17 @@ const MainContent = ({ serviceProvider, viewModel }: MainContentProps): React.JS
               </Text>
             </Stack>
             <ListControl />
+          </Stack>
+        )}
+        {viewModel.contactDisplayValues.length > 0 && (
+          <Stack tokens={{ childrenGap: 10 }}>
+            <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 8 }}>
+              <Icon iconName="People" styles={{ root: { color: theme.palette.themePrimary } }} />
+              <Text variant="mediumPlus" styles={{ root: { fontWeight: 600 } }}>
+                Loaded contacts
+              </Text>
+            </Stack>
+            <ContactListControl />
           </Stack>
         )}
       </Stack>

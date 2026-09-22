@@ -4,6 +4,10 @@ export interface AccountSummary {
   name?: string;
 }
 
+export interface ContactSummary {
+  fullname?: string;
+}
+
 export class DataverseService {
   webApi: ComponentFramework.WebApi;
   context: ComponentFramework.Context<IInputs>;
@@ -17,5 +21,11 @@ export class DataverseService {
     return this.webApi
       .retrieveMultipleRecords("account", "?$select=name&$top=5")
       .then((response) => (response?.entities ?? []) as AccountSummary[]);
+  }
+
+  loadContacts(): Promise<ContactSummary[]> {
+    return this.webApi
+      .retrieveMultipleRecords("contact", "?$select=fullname&$top=5")
+      .then((response) => (response?.entities ?? []) as ContactSummary[]);
   }
 }

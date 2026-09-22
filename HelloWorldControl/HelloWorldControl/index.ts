@@ -70,6 +70,24 @@ export class HelloWorldControl implements ComponentFramework.StandardControl<IIn
         });
     }
 
+    if (!vm.loadingContacts && vm.contactDisplayValues.length === 0) {
+      vm.set("loadingContacts", true);
+      dv.loadContacts()
+        .then((result) => {
+          vm.set(
+            "contactDisplayValues",
+            result.map((entity) => entity.fullname ?? ""),
+          );
+        })
+        .catch((error) => {
+          console.error("Error loading contacts:", error);
+          vm.set("contactDisplayValues", []);
+        })
+        .finally(() => {
+          vm.set("loadingContacts", false);
+        });
+    }
+
     const reactRoot = createRoot(this._container);
     reactRoot.render(
       React.createElement(StartingTemplateControlMain, {
